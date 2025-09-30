@@ -21,9 +21,8 @@ Add a file named `local.settings.json` in the root of your project with the foll
 {
     "IsEncrypted": false,
     "Values": {
-      "AzureWebJobsStorage": "UseDevelopmentStorage=true",
       "FUNCTIONS_WORKER_RUNTIME": "python"
-     "OPENAI_API_KEY": "<your-open-ai-api-key>"
+      "OPENAI_API_KEY": "<your-open-ai-api-key>"
 
     }
 }
