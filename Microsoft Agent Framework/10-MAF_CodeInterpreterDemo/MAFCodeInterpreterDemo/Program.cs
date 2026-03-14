@@ -10,7 +10,7 @@ using System.Text;
 #pragma warning disable MEAI001, OPENAI001
 
 var endpoint = Environment.GetEnvironmentVariable("AZURE_FOUNDRY_PROJECT_ENDPOINT") ?? "";
-var deploymentName = "gpt-4o";
+var deploymentName = Environment.GetEnvironmentVariable("AZURE_FOUNDRY_PROJECT_DEPLOYMENT_NAME") ?? "";
 
 // AI Foundry Client erzeugen
 AIProjectClient client = new(new Uri(endpoint), new AzureCliCredential()); // vorher mit `az login` anmelden

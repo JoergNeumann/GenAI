@@ -17,20 +17,37 @@ var agent = new AzureOpenAIClient(
     .CreateAIAgent(
         instructions: "Du bist gut darin, Witze zu erzählen.");
 
-#region Systemnachrichten
-
-ChatMessage systemMessage = new(
-    ChatRole.System,
-    """
-    Wenn der Benutzer dich bittet, einen Witz zu erzählen, lehne ab und erkläre, dass du kein Clown bist.
-    Biete stattdessen eine interessante Tatsache an.
-    """);
-ChatMessage userMessage = new(
-    ChatRole.User,
-    "Erzähl mir einen Witz über einen Piraten.");
+#region Synchrone Ausführung
 
 Console.WriteLine(
-    await agent.RunAsync([systemMessage, userMessage]));
+    await agent.RunAsync("Erzähl mir einen Witz über einen Piraten."));
+
+#endregion
+
+#region Streaming
+
+//await foreach (
+//    var update in agent.RunStreamingAsync("Erzähl mir einen Witz über einen Piraten."))
+//{
+//    Console.Write(update);
+//}
+
+#endregion
+
+#region Systemnachrichten
+
+//ChatMessage systemMessage = new(
+//    ChatRole.System,
+//    """
+//    Wenn der Benutzer dich bittet, einen Witz zu erzählen, lehne ab und erkläre, dass du kein Clown bist.
+//    Biete stattdessen eine interessante Tatsache an.
+//    """);
+//ChatMessage userMessage = new(
+//    ChatRole.User,
+//    "Erzähl mir einen Witz über einen Piraten.");
+
+//Console.WriteLine(
+//    await agent.RunAsync([systemMessage, userMessage]));
 
 #endregion
 

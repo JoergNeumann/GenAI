@@ -9,6 +9,10 @@ using System.ClientModel;
 
 #pragma warning disable MEAI001
 
+// Ausgaben über STDIO unterdrücken
+Console.SetOut(TextWriter.Null);
+Console.SetError(TextWriter.Null);
+
 var apiKey = Environment.GetEnvironmentVariable("AZURE_OPENAI_API_KEY") ?? "";
 var endpint = Environment.GetEnvironmentVariable("AZURE_OPENAI_ENDPOINT") ?? "";
 var deploymentName = "GPT4o";
@@ -30,3 +34,11 @@ builder.Services
     .WithTools([tool]);
 
 await builder.Build().RunAsync();
+
+
+// In VSCode einfügen:
+// -- in GitHub Copilot Chat:
+// -- Shift+STRG+P
+// -- MCP: Add Server...
+// Command (stdio): dotnet run --project C:\\MeinVerzeichnis\\MAF_MCPDemo.csproj
+// global
