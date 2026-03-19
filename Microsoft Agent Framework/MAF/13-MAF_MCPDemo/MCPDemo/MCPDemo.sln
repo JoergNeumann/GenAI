@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36603.0 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCPServer", "MCPDemo\MCPServer.csproj", "{4334DFCE-324E-4525-B791-62CFD5E7FBF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCPClient", "MCPClient\MCPClient.csproj", "{4A2FB817-2676-4AAD-AF4B-C1F63EAF5EE4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4334DFCE-324E-4525-B791-62CFD5E7FBF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4334DFCE-324E-4525-B791-62CFD5E7FBF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4334DFCE-324E-4525-B791-62CFD5E7FBF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4334DFCE-324E-4525-B791-62CFD5E7FBF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A2FB817-2676-4AAD-AF4B-C1F63EAF5EE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A2FB817-2676-4AAD-AF4B-C1F63EAF5EE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A2FB817-2676-4AAD-AF4B-C1F63EAF5EE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A2FB817-2676-4AAD-AF4B-C1F63EAF5EE4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {918BA5F2-D72D-41A7-944A-5D7393B2B4F6}
+	EndGlobalSection
+EndGlobal
