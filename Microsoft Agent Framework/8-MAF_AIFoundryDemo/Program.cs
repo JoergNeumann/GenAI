@@ -1,40 +1,22 @@
-﻿using Azure.AI.Agents.Persistent;
+﻿using Azure.AI.Projects;
+using Azure.AI.Projects.Agents;
 using Azure.Identity;
-using Microsoft.Agents.AI;
 
 var endpoint = Environment.GetEnvironmentVariable("AZURE_FOUNDRY_PROJECT_ENDPOINT") ?? throw new InvalidOperationException("Die Umgebungsvariable AZURE_FOUNDRY_PROJECT_ENDPOINT ist nicht gesetzt.");
 var deploymentName = Environment.GetEnvironmentVariable("AZURE_FOUNDRY_PROJECT_DEPLOYMENT_NAME") ?? "gpt-4o-mini";
 
-const string JokerName = "Joker";
-const string JokerInstructions = "Du bist gut darin, Witze zu erzählen.";
+AIProjectClient aiProjectClient = new(new Uri(endpoint), new AzureCliCredential());
 
-var persistentAgentsClient = new PersistentAgentsClient(
-    endpoint, 
-    new AzureCliCredential());
+ProjectsAgentVersion agentVersion = await aiProjectClient.AgentAdministrationClient.CreateAgentVersionAsync(
+    "JokerAgent",
+    new ProjectsAgentVersionCreationOptions(
+        new DeclarativeAgentDefinition(model: deploymentName)
+        {
+            Instructions = "You are good at telling jokes.",
+        }));
 
-// serverseitigen Agent erstellen
-var agentMetadata = await persistentAgentsClient.Administration.CreateAgentAsync(
-    model: deploymentName,
-    name: JokerName,
-    instructions: JokerInstructions);
+var agent = aiProjectClient.AsAIAgent(agentVersion);
 
-// Alternativ: bestehenden Agent abrufen
-AIAgent agent1 = await persistentAgentsClient.GetAIAgentAsync(agentMetadata.Value.Id);
+Console.WriteLine(await agent.RunAsync("Tell me a joke about a pirate."));
 
-// Alternativ: Agent erstellen und zurückgeben
-AIAgent agent2 = await persistentAgentsClient.CreateAIAgentAsync(
-    model: deploymentName,
-    name: JokerName,
-    instructions: JokerInstructions);
-
-AgentSession session = await agent1.CreateSessionAsync();
-
-var result = await agent1.RunAsync(
-    "Erzähl mir einen Witz über einen Piraten.", 
-    session);
-
-Console.WriteLine(result);
-
-// Aufräumen.
-await persistentAgentsClient.Administration.DeleteAgentAsync(agent1.Id);
-await persistentAgentsClient.Administration.DeleteAgentAsync(agent2.Id);
+await aiProjectClient.AgentAdministrationClient.DeleteAgentAsync(agent.Name);
