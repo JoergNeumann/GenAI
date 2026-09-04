@@ -7,8 +7,6 @@ using ModelContextProtocol.Server;
 using OpenAI.Chat;
 using System.ClientModel;
 
-#pragma warning disable MEAI001
-
 // Ausgaben über STDIO unterdrücken
 Console.SetOut(TextWriter.Null);
 Console.SetError(TextWriter.Null);
@@ -34,7 +32,6 @@ builder.Services
     .WithTools([tool]);
 
 await builder.Build().RunAsync();
-
 
 // In VSCode einfügen:
 // -- in GitHub Copilot Chat:

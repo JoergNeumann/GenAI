@@ -5,8 +5,6 @@ using OpenAI.Chat;
 using System.ClientModel;
 using System.Text.Json;
 
-#pragma warning disable MEAI001
-
 var apiKey = Environment.GetEnvironmentVariable("AZURE_OPENAI_API_KEY") ?? "";
 var endpint = Environment.GetEnvironmentVariable("AZURE_OPENAI_ENDPOINT") ?? "";
 var deploymentName = "GPT4o";
@@ -20,15 +18,17 @@ var agent = new AzureOpenAIClient(
 AgentSession session = await agent.CreateSessionAsync();
 
 // Dialog führen
+Console.WriteLine("\u001b[93m> Kennst Du Hamburg?\u001b[0m");
 Console.WriteLine(
-    await agent.RunAsync("Kennst Du Hamburg?",
-    session));
+    await agent.RunAsync("Kennst Du Hamburg?", session));
+
+Console.WriteLine("\n\u001b[93m> Welche Stadtteile kennst Du?\u001b[0m");
 Console.WriteLine(
-    await agent.RunAsync("Welche Stadtteile kennst Du?",
-    session));
+    await agent.RunAsync("Welche Stadtteile kennst Du?", session));
 
 // Session serialisieren und speichern
-var serializedJson = (await agent.SerializeSessionAsync(session, JsonSerializerOptions.Web)).GetRawText();
+var serializedJson =
+    (await agent.SerializeSessionAsync(session, JsonSerializerOptions.Web)).GetRawText();
     
 var filePath = Path.Combine(Path.GetTempPath(), "agent_session.json");
 await File.WriteAllTextAsync(filePath, serializedJson);
@@ -45,7 +45,8 @@ var resumedSession = await agent.DeserializeSessionAsync(
     JsonSerializerOptions.Web);
 
 // Dialog fortsetzen
+Console.WriteLine("\n\u001b[93m> Wieviele Brücken gibt es in der Stadt?\u001b[0m");
 Console.WriteLine(
-    await agent.RunAsync(
-        "Wieviele Brücken gibt es in der Stadt?", 
-        resumedSession));
+    await agent.RunAsync("Wieviele Brücken gibt es in der Stadt?", resumedSession));
+
+Console.ReadLine();

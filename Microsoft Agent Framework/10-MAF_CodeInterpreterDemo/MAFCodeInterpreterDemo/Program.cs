@@ -19,6 +19,8 @@ AIAgent agent = client.AsAIAgent(
     name: "CoderAgent",
     tools: [new HostedCodeInterpreterTool() { Inputs = [] }]);
 
+Console.WriteLine("\u001b[93m> Erzeuge mir einen QR-Code für https://www.neogeeks.de.\u001b[0m");
+
 AgentResponse response = await agent.RunAsync("Erzeuge mir einen QR-Code für https://www.neogeeks.de.");
 
 // Anweisungen und Code für den Code Interpreter ausgeben
@@ -28,7 +30,7 @@ if (toolCallContent?.Inputs is not null)
     DataContent? codeInput = toolCallContent.Inputs.OfType<DataContent>().FirstOrDefault();
     if (codeInput?.HasTopLevelMediaType("text") ?? false)
     {
-        Console.WriteLine($"Code Input: {Encoding.UTF8.GetString(codeInput.Data.ToArray()) ?? "Not available"}");
+        Console.WriteLine($"Code Input:\n\n\u001b[32m {Encoding.UTF8.GetString(codeInput.Data.ToArray()) ?? "Not available"}\n\u001b[0m");
     }
 }
 
@@ -36,7 +38,7 @@ if (toolCallContent?.Inputs is not null)
 CodeInterpreterToolResultContent? toolResultContent = response.Messages.SelectMany(m => m.Contents).OfType<CodeInterpreterToolResultContent>().FirstOrDefault();
 if (toolResultContent?.Outputs is not null && toolResultContent.Outputs.OfType<TextContent>().FirstOrDefault() is { } resultOutput)
 {
-    Console.WriteLine($"Code Tool Result: {resultOutput.Text}");
+    Console.WriteLine($"Code Tool Result: \n\u001b[91m{resultOutput.Text}\n\u001b[0m");
 }
 
 // Datei-Anmerkungen ausgeben (wenn vorhanden)
@@ -50,4 +52,7 @@ foreach (AIAnnotation annotation in response.Messages.SelectMany(m => m.Contents
             """);
     }
 }
+Console.WriteLine();
 Console.WriteLine(response.Text);
+
+Console.ReadLine();

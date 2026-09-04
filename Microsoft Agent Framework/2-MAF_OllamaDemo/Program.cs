@@ -10,5 +10,9 @@ AIAgent agent = new OllamaApiClient(new Uri(endpoint), modelName)
         instructions: "Du bist gut darin, Witze zu erzählen.", 
         name: "Joker");
 
-var result = await agent.RunAsync("Erzähl mir einen Witz über einen Piraten.");
+Console.WriteLine("\u001b[93m> Erzähl mir einen Witz über einen Piraten\u001b[0m");
+
+var result = await agent.RunAsync("Erzähl mir einen Witz über einen Piraten");
+
 Console.WriteLine(result);
+Console.ReadLine();

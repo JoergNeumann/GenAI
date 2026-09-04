@@ -39,7 +39,6 @@ AIAgent agent = new OpenAIClient(apiKey)
 );
 
 // Testlauf
-var prompt = "Wie ist das Wetter in Berlin?";
-var result = await agent.RunAsync(prompt);
-
-Console.WriteLine(result);
+Console.WriteLine("\u001b[93m> Wie ist das Wetter in Berlin?\u001b[0m");
+Console.WriteLine(
+    await agent.RunAsync("Wie ist das Wetter in Berlin?"));

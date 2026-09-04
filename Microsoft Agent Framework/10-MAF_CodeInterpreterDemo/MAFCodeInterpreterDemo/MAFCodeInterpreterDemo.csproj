@@ -8,12 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.AI.Agents.Persistent" Version="1.2.0-beta.10" />
+    <PackageReference Include="Azure.AI.Agents.Persistent" Version="1.1.0" />
     <PackageReference Include="Azure.AI.Projects.OpenAI" Version="2.0.0-beta.1" />
     <PackageReference Include="Microsoft.Agents.AI.AzureAI" Version="1.0.0-rc5" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="11.0.0-preview.4.26230.115" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.11" />
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
-    <PackageReference Include="Azure.AI.Projects" Version="2.1.0-beta.2" />
+    <PackageReference Include="Azure.AI.Projects" Version="2.0.1" />
   </ItemGroup>
 
 </Project>

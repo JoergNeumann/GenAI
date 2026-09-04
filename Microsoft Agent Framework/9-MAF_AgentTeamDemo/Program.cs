@@ -5,8 +5,6 @@ using OpenAI.Chat;
 using System.ClientModel;
 using System.ComponentModel;
 
-#pragma warning disable MEAI001
-
 var apiKey = Environment.GetEnvironmentVariable("AZURE_OPENAI_API_KEY") ?? "";
 var endpint = Environment.GetEnvironmentVariable("AZURE_OPENAI_ENDPOINT") ?? "";
 var deploymentName = "GPT4o";
@@ -27,63 +25,72 @@ AIAgent weatherAgent = new AzureOpenAIClient(
         description: "Ein Agent, der Fragen zum Wetter beantwortet.",
         tools: [AIFunctionFactory.Create(GetWeather)]);
 
+Console.WriteLine("\u001b[93m> Wie ist das Wetter in Amsterdam?\u001b[0m");
+
 Console.WriteLine(await weatherAgent.RunAsync("Wie ist das Wetter in Amsterdam?"));
 
 #endregion
 
 #region Agent als Function Tool verwenden
 
-//AIAgent mainAgent = new AzureOpenAIClient(
-//    new Uri(endpint),
-//    new ApiKeyCredential(apiKey))
-//    .GetChatClient(deploymentName)
-//    .AsAIAgent(instructions: "Du bist ein hilfreicher Assistent, der auf Französisch antwortet.",
-//    tools: [weatherAgent.AsAIFunction()]);
+AIAgent mainAgent = new AzureOpenAIClient(
+    new Uri(endpint),
+    new ApiKeyCredential(apiKey))
+    .GetChatClient(deploymentName)
+    .AsAIAgent(instructions: "Du bist ein hilfreicher Assistent, der auf Französisch antwortet.",
+    tools: [weatherAgent.AsAIFunction()]);
 
-//Console.WriteLine(await mainAgent.RunAsync("Wie ist das Wetter in Amsterdam?"));
+Console.WriteLine("\n\u001b[93m> Wie ist das Wetter in Amsterdam?\u001b[0m");
+
+Console.WriteLine(await mainAgent.RunAsync("Wie ist das Wetter in Amsterdam?"));
 
 #endregion
 
 #region Human Workflows
 
-//AIFunction weatherFunction = AIFunctionFactory.Create(GetWeather);
-//AIFunction approvalRequiredWeatherFunction =
-//    new ApprovalRequiredAIFunction(weatherFunction);
+AIFunction weatherFunction = AIFunctionFactory.Create(GetWeather);
+AIFunction approvalRequiredWeatherFunction =
+    new ApprovalRequiredAIFunction(weatherFunction);
 
-//AIAgent hybridAgent = new AzureOpenAIClient(
-//    new Uri(endpint),
-//    new ApiKeyCredential(apiKey))
-//     .GetChatClient(deploymentName)
-//     .AsAIAgent(
-//        instructions: "Du bist ein hilfreicher Assistent.",
-//        tools: [approvalRequiredWeatherFunction]);
+AIAgent hybridAgent = new AzureOpenAIClient(
+    new Uri(endpint),
+    new ApiKeyCredential(apiKey))
+     .GetChatClient(deploymentName)
+     .AsAIAgent(
+        instructions: "Du bist ein hilfreicher Assistent.",
+        tools: [approvalRequiredWeatherFunction]);
 
-//AgentSession session = await hybridAgent.CreateSessionAsync();
-//var response = await hybridAgent.RunAsync(
-//    "Wie ist das Wetter in Amsterdam?", session);
+AgentSession session = await hybridAgent.CreateSessionAsync();
+var response = await hybridAgent.RunAsync(
+    "Wie ist das Wetter in Amsterdam?", session);
 
-//var functionApprovalRequests = response.Messages
-//    .SelectMany(x => x.Contents)
-//    .OfType<FunctionApprovalRequestContent>()
-//    .ToList();
+var functionApprovalRequests = response.Messages
+    .SelectMany(x => x.Contents)
+    .OfType<ToolApprovalRequestContent>()
+    .ToList();
 
-//FunctionApprovalRequestContent requestContent =
-//    functionApprovalRequests.First();
+ToolApprovalRequestContent requestContent =
+    functionApprovalRequests.First();
 
-//Console.WriteLine(
-//    $"Wir benötigen eine Freigabe zur Ausführung " +
-//    $"'{requestContent.FunctionCall.Name}'");
+var functionCall = (FunctionCallContent)requestContent.ToolCall;
 
-//Console.ReadLine();
+Console.WriteLine(
+    $"\n\u001b[93m> Wir benötigen eine Freigabe zur Ausführung " +
+    $"'{functionCall.Name}'\u001b[0m");
 
-//var approvalMessage = new Microsoft.Extensions.AI.ChatMessage(
-//    ChatRole.User,
-//    [requestContent.CreateResponse(true)]);
+Console.ReadLine();
+Console.WriteLine($"\u001b[32m*** Freigabe erteilt ***\u001b[0m");
 
-//var result = await hybridAgent.RunAsync(
-//    approvalMessage,
-//    session);
+var approvalMessage = new Microsoft.Extensions.AI.ChatMessage(
+    ChatRole.User,
+    [requestContent.CreateResponse(true)]);
 
-//Console.WriteLine(result);
+var result = await hybridAgent.RunAsync(
+    approvalMessage,
+    session);
+
+Console.WriteLine(result);
+
+Console.ReadLine();
 
 #endregion

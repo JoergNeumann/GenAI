@@ -12,11 +12,16 @@ ProjectsAgentVersion agentVersion = await aiProjectClient.AgentAdministrationCli
     new ProjectsAgentVersionCreationOptions(
         new DeclarativeAgentDefinition(model: deploymentName)
         {
-            Instructions = "You are good at telling jokes.",
+            Instructions = "Du bist gut im Witze erzählen.",
         }));
 
 var agent = aiProjectClient.AsAIAgent(agentVersion);
 
-Console.WriteLine(await agent.RunAsync("Tell me a joke about a pirate."));
+Console.WriteLine("\u001b[93m> Erzähl mir einen Witz über einen Piraten\u001b[0m");
+
+Console.WriteLine(
+    await agent.RunAsync("Erzähl mir eine Witz über einen Piraten."));
 
 await aiProjectClient.AgentAdministrationClient.DeleteAgentAsync(agent.Name);
+
+Console.ReadLine();

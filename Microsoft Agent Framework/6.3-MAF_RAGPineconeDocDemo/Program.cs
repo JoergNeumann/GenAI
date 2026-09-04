@@ -4,9 +4,6 @@ using Microsoft.Agents.AI;
 using OpenAI.Chat;
 using OpenAI.Embeddings;
 using Pinecone;
-using System.Text;
-
-#pragma warning disable MEAI001
 
 // vorher: Account und Index auf https://app.pinecone.io/ anlegen, API-Key und Index-Name in Umgebungsvariablen speichern
 // Indextyp: text-embedding-3-small, Vector type: Dense, Dimension: 1024, Metric: cosine
@@ -20,15 +17,15 @@ string pineconeIndexName = "onbo-knowledge";
 string pineconeNamespace = "__default__";
 
 // Azure OpenAI Client
-var azureOpenAi = new AzureOpenAIClient(
+var azureOpenAI = new AzureOpenAIClient(
     new Uri(endpoint),
     new DefaultAzureCredential());
 
 // Chat Client
-var chatClient = azureOpenAi.GetChatClient(chatDeployment);
+var chatClient = azureOpenAI.GetChatClient(chatDeployment);
 
 // Azure OpenAI Embeddings Client
-EmbeddingClient embeddingClient = azureOpenAi.GetEmbeddingClient(embeddingDeployment);
+EmbeddingClient embeddingClient = azureOpenAI.GetEmbeddingClient(embeddingDeployment);
 
 // Pinecone .NET Client
 var pinecone = new PineconeClient(pineconeApiKey);
@@ -65,17 +62,22 @@ Console.WriteLine();
 
 while (true)
 {
+    // Frage vom Benutzer einlesen
+    Console.ForegroundColor = ConsoleColor.Yellow;
     Console.Write("> ");
     var question = Console.ReadLine();
 
+    // Abbruch?
     if (string.IsNullOrWhiteSpace(question) ||
         question.Equals("exit", StringComparison.OrdinalIgnoreCase))
     {
         break;
     }
 
+    // Frage an den Agenten stellen und Antwort ausgeben
     var answer = await agent.RunAsync(question);
     Console.WriteLine();
+    Console.ResetColor();
     Console.WriteLine(answer);
     Console.WriteLine();
 }

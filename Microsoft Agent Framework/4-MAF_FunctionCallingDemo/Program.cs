@@ -3,10 +3,7 @@ using Microsoft.Extensions.AI;
 using OpenAI;
 using OpenAI.Chat;
 using OpenAI.Responses;
-using System.ClientModel;
 using System.ComponentModel;
-
-#pragma warning disable OPENAI001
 
 var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new InvalidOperationException("Die Umgebungsvariable OPENAI_API_KEY ist nicht gesetzt.");
 var model = Environment.GetEnvironmentVariable("OPENAI_MODEL") ?? "gpt-4o-mini";
@@ -22,6 +19,8 @@ AIAgent agent = new OpenAIClient(apiKey)
         name: "Joker",
         tools: [AIFunctionFactory.Create(GetWeather)]);
 
+Console.WriteLine("\u001b[93m> Wie ist gerade das Wetter in Amsterdam?\u001b[0m");
+
 UserChatMessage chatMessage =
     new("Wie ist gerade das Wetter in Amsterdam?");
 
@@ -32,12 +31,14 @@ ChatCompletion chatCompletion =
 Console.WriteLine(chatCompletion.Content.Last().Text);
 
 // Streaming-Beispiel
-AsyncCollectionResult<StreamingChatCompletionUpdate> completionUpdates = 
-    agent.RunStreamingAsync(new[] { chatMessage });
-await foreach (StreamingChatCompletionUpdate completionUpdate in completionUpdates)
-{
-    if (completionUpdate.ContentUpdate.Count >0)
-    {
-        Console.Write(completionUpdate.ContentUpdate[0].Text);
-    }
-}
+//AsyncCollectionResult<StreamingChatCompletionUpdate> completionUpdates = 
+//    agent.RunStreamingAsync(new[] { chatMessage });
+//await foreach (StreamingChatCompletionUpdate completionUpdate in completionUpdates)
+//{
+//    if (completionUpdate.ContentUpdate.Count >0)
+//    {
+//        Console.Write(completionUpdate.ContentUpdate[0].Text);
+//    }
+//}
+
+Console.ReadLine();

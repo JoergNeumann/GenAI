@@ -23,6 +23,8 @@ AIAgent agent = new AzureOpenAIClient(
             }
         });
 
+Console.WriteLine("\u001b[93m> Bitte gib Informationen über John Smith, der ein 35-jähriger Softwareentwickler ist\u001b[0m");
+
 var response = await agent.RunAsync(
     "Bitte gib Informationen über John Smith, der ein 35-jähriger Softwareentwickler ist.");
 var personInfo = JsonSerializer.Deserialize<PersonInfo>(response.Text, JsonSerializerOptions.Web)!;// response.Deserialize<PersonInfo>(JsonSerializerOptions.Web);
@@ -34,4 +36,4 @@ Console.WriteLine($"Name: {personInfo.Name}, Alter: {personInfo.Age}, Beruf: {pe
 //PersonInfo personInfo2 = JsonSerializer.Deserialize<PersonInfo>(nonGenericResponse.Text, JsonSerializerOptions.Web)!;
 //Console.WriteLine($"Name: {personInfo2.Name}, Alter: {personInfo2.Age}, Beruf: {personInfo2.Occupation}");
 
-
+Console.ReadLine();

@@ -1,5 +1,4 @@
 ﻿using Azure.AI.OpenAI;
-using Azure.Identity;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Samples;
 using Microsoft.Extensions.AI;
@@ -7,8 +6,6 @@ using Microsoft.Extensions.VectorData;
 using Microsoft.SemanticKernel.Connectors.InMemory;
 using OpenAI.Chat;
 using System.ClientModel;
-
-#pragma warning disable MEAI001
 
 var apiKey = Environment.GetEnvironmentVariable("AZURE_OPENAI_API_KEY") ?? "";
 var endpint = Environment.GetEnvironmentVariable("AZURE_OPENAI_ENDPOINT") ?? "";
@@ -19,23 +16,23 @@ var azureOpenAIClient = new AzureOpenAIClient(
   new Uri(endpint),
   new ApiKeyCredential(apiKey));
 
-// Create an In-Memory vector store that uses the Azure OpenAI embedding model to generate embeddings.
+// Erstellt einen In-Memory-Vektorstore, der das Azure OpenAI Embedding-Modell zur Generierung von Embeddings verwendet.
 VectorStore vectorStore = new InMemoryVectorStore(new()
 {
     EmbeddingGenerator = azureOpenAIClient.GetEmbeddingClient(embeddingDeploymentName).AsIEmbeddingGenerator()
 });
 
-// Create a store that defines a storage schema, and uses the vector store to store and retrieve documents.
+// Erstellt einen Store, der ein Speicherschema definiert und den Vektorstore zum Speichern und Abrufen von Dokumenten verwendet.
 TextSearchStore textSearchStore = new(vectorStore, "product-and-policy-info", 3072);
 
-// Upload sample documents into the store.
+// Lädt Beispiel-Dokumente in den Store hoch.
 await textSearchStore.UpsertDocumentsAsync(GetSampleDocuments());
 
-// Create an adapter function that the TextSearchProvider can use to run searches against the TextSearchStore.
+// Erstellt eine Adapterfunktion, die der TextSearchProvider verwenden kann, um Suchen im TextSearchStore auszuführen.
 Func<string, CancellationToken, Task<IEnumerable<TextSearchProvider.TextSearchResult>>> SearchAdapter = async (text, ct) =>
 {
-    // Here we are limiting the search results to the single top result to demonstrate that we are accurately matching
-    // specific search results for each question, but in a real world case, more results should be used.
+    // Hier begrenzen wir die Suchergebnisse auf das jeweils oberste Ergebnis, um zu demonstrieren, dass wir
+    // spezifische Suchergebnisse für jede Frage genau treffen; in einer realen Anwendung sollten jedoch mehrere Ergebnisse verwendet werden.
     var searchResults = await textSearchStore.SearchAsync(text, 1, ct);
     return searchResults.Select(r => new TextSearchProvider.TextSearchResult
     {
@@ -46,44 +43,56 @@ Func<string, CancellationToken, Task<IEnumerable<TextSearchProvider.TextSearchRe
     });
 };
 
-// Configure the options for the TextSearchProvider.
+// Konfiguriert die Optionen für den TextSearchProvider.
 TextSearchProviderOptions textSearchOptions = new()
 {
-    // Run the search prior to every model invocation.
+    // Führt die Suche vor jedem Modellaufruf aus.
     SearchTime = TextSearchProviderOptions.TextSearchBehavior.BeforeAIInvoke,
 };
 
-// Create the AI agent with the TextSearchProvider as the AI context provider.
+// Erstellt den KI-Agenten mit dem TextSearchProvider als AI-Kontextanbieter.
 AIAgent agent = azureOpenAIClient
     .GetChatClient(deploymentName)
     .AsAIAgent(new ChatClientAgentOptions
     {
-        ChatOptions = new() { Instructions = "You are a helpful support specialist for Contoso Outdoors. Answer questions using the provided context and cite the source document when available." },
+        ChatOptions = new() { Instructions = 
+            """
+            Du bist eine hilfreiche Support-Fachkraft für Contoso Outdoors. 
+            Beantworte Fragen mithilfe des bereitgestellten Kontexts und
+            gebe das Quelldokument an, wenn verfügbar.
+            """ },
+            
         AIContextProviders = [new TextSearchProvider(SearchAdapter, textSearchOptions)],
-        // Since we are using ChatCompletion which stores chat history locally, we can also add a message filter
-        // that removes messages produced by the TextSearchProvider before they are added to the chat history, so that
-        // we don't bloat chat history with all the search result messages.
-        // By default the chat history provider will store all messages, except for those that came from chat history in the first place.
-        // We also want to maintain that exclusion here.
+
+        // Da wir ChatCompletion verwenden, das den Chatverlauf lokal speichert, können wir außerdem einen Nachrichtenfilter hinzufügen,
+        // der Nachrichten entfernt, die vom TextSearchProvider erzeugt wurden, bevor sie dem Chatverlauf hinzugefügt werden,
+        // damit wir den Chatverlauf nicht mit allen Suchergebnissen aufblähen.
+        // Standardmäßig speichert der Chatverlauf-Provider alle Nachrichten, außer denen, die ursprünglich aus dem Chatverlauf stammen.
+        // Diese Ausnahme möchten wir auch hier beibehalten.
         ChatHistoryProvider = new InMemoryChatHistoryProvider(new InMemoryChatHistoryProviderOptions
         {
-            StorageInputRequestMessageFilter = messages => messages.Where(m => m.GetAgentRequestMessageSourceType() != AgentRequestMessageSourceType.AIContextProvider && m.GetAgentRequestMessageSourceType() != AgentRequestMessageSourceType.ChatHistory)
+            StorageInputRequestMessageFilter = messages => messages
+            .Where(m => m.GetAgentRequestMessageSourceType() != AgentRequestMessageSourceType.AIContextProvider &&
+                        m.GetAgentRequestMessageSourceType() != AgentRequestMessageSourceType.ChatHistory)
         }),
     });
 
 AgentSession session = await agent.CreateSessionAsync();
 
-Console.WriteLine(">> Asking about returns\n");
-Console.WriteLine(await agent.RunAsync("Hi! I need help understanding the return policy.", session));
+Console.WriteLine("\u001b[93m*** Frage zur Rückgabepolitik ***");
+Console.WriteLine(">> Hallo! Ich benötige Hilfe, um die Rückgabebedingungen zu verstehen\n\u001b[0m");
+Console.WriteLine(await agent.RunAsync("Hallo! Ich benötige Hilfe, um die Rückgabebedingungen zu verstehen.", session));
 
-Console.WriteLine("\n>> Asking about shipping\n");
-Console.WriteLine(await agent.RunAsync("How long does standard shipping usually take?", session));
+Console.WriteLine("\n\u001b[93m*** Frage zum Versand ***");
+Console.WriteLine(">> Wie lange dauert der Standardversand in der Regel?\n\u001b[0m");
+Console.WriteLine(await agent.RunAsync("Wie lange dauert der Standardversand in der Regel?", session));
 
-Console.WriteLine("\n>> Asking about product care\n");
-Console.WriteLine(await agent.RunAsync("What is the best way to maintain the TrailRunner tent fabric?", session));
+Console.WriteLine("\n\u001b[93m*** Frage zur Produktpflege ***");
+Console.WriteLine(">> Wie pflegt man das Zeltmaterial des TrailRunner am besten?\n\u001b[0m");
+Console.WriteLine(await agent.RunAsync("Wie pflegt man das Zeltmaterial des TrailRunner am besten?", session));
 
-// Produces some sample search documents.
-// Each one contains a source name and link, which the agent can use to cite sources in its responses.
+// Erzeugt einige Beispiel-Suchdokumente.
+// Jedes enthält einen Quellnamen und einen Link, die der Agent verwenden kann, um Quellen in seinen Antworten zu zitieren.
 static IEnumerable<TextSearchDocument> GetSampleDocuments()
 {
     yield return new TextSearchDocument
@@ -91,20 +100,22 @@ static IEnumerable<TextSearchDocument> GetSampleDocuments()
         SourceId = "return-policy-001",
         SourceName = "Contoso Outdoors Return Policy",
         SourceLink = "https://contoso.com/policies/returns",
-        Text = "Customers may return any item within 30 days of delivery. Items should be unused and include original packaging. Refunds are issued to the original payment method within 5 business days of inspection."
+        Text = "Kunden können jeden Artikel innerhalb von 30 Tagen nach Lieferung zurückgeben. Artikel sollten unbenutzt sein und die Originalverpackung enthalten. Rückerstattungen werden innerhalb von 5 Werktagen nach Prüfung auf die ursprüngliche Zahlungsmethode ausgezahlt."
     };
     yield return new TextSearchDocument
     {
         SourceId = "shipping-guide-001",
         SourceName = "Contoso Outdoors Shipping Guide",
         SourceLink = "https://contoso.com/help/shipping",
-        Text = "Standard shipping is free on orders over $50 and typically arrives in 3-5 business days within the continental United States. Expedited options are available at checkout."
+        Text = "Standardversand ist bei Bestellungen über $50 kostenlos und trifft in der Regel innerhalb von 3–5 Werktagen im Festland der Vereinigten Staaten ein. Beschleunigte Versandoptionen sind beim Checkout verfügbar."
     };
     yield return new TextSearchDocument
     {
         SourceId = "tent-care-001",
         SourceName = "TrailRunner Tent Care Instructions",
         SourceLink = "https://contoso.com/manuals/trailrunner-tent",
-        Text = "Clean the tent fabric with lukewarm water and a non-detergent soap. Allow it to air dry completely before storage and avoid prolonged UV exposure to extend the lifespan of the waterproof coating."
+        Text = "Reinigen Sie das Zeltgewebe mit lauwarmem Wasser und einer milden, nicht-waschmittelhaltigen Seife. Lassen Sie es vor der Lagerung vollständig an der Luft trocknen und vermeiden Sie längere UV-Einstrahlung, um die Lebensdauer der wasserdichten Beschichtung zu verlängern."
     };
 }
+
+Console.ReadLine();
