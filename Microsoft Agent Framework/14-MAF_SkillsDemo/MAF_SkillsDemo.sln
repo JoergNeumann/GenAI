@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.6.11828.311 oobstable
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MAF_SkillsDemo", "MAF_SkillsDemo.csproj", "{03E9B73D-F4CF-10B0-FAB3-BB7183DC8E20}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{03E9B73D-F4CF-10B0-FAB3-BB7183DC8E20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03E9B73D-F4CF-10B0-FAB3-BB7183DC8E20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03E9B73D-F4CF-10B0-FAB3-BB7183DC8E20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03E9B73D-F4CF-10B0-FAB3-BB7183DC8E20}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7C1197F3-FD52-4973-915E-08539CC3B286}
+	EndGlobalSection
+EndGlobal

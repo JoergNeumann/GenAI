@@ -1,16 +1,27 @@
 ﻿using Microsoft.Agents.AI;
 using OpenAI;
 using OpenAI.Chat;
+using OpenAI.Responses;
+
+#pragma warning disable OPENAI001
 
 var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? throw new InvalidOperationException("Die Umgebungsvariable OPENAI_API_KEY ist nicht gesetzt.");
-var model = Environment.GetEnvironmentVariable("OPENAI_MODEL") ?? "gpt-4o-mini";
+var modelName = Environment.GetEnvironmentVariable("OPENAI_MODEL") ?? "gpt-4o-mini";
 
+// Chat Completions API verwenden
 AIAgent agent = new OpenAIClient(apiKey)
-    .GetChatClient(model)             // Chat Completions API verwenden
-    //.GetOpenAIResponseClient(model) // Alternativ: Responses API verwenden
+    .GetChatClient(modelName)
     .AsAIAgent(
-        instructions: "Du bist gut darin, Witze zu erzählen.", 
+        instructions: "Du bist gut darin, Witze zu erzählen.",
         name: "Joker");
+
+// Alternativ: Responses API verwenden
+//AIAgent agent = new OpenAIClient(apiKey)
+//    .GetResponsesClient()
+//    .AsAIAgent(
+//        modelName,
+//        instructions: "Du bist gut darin, Witze zu erzählen.",
+//        name: "Joker");
 
 Console.WriteLine("\u001b[93m> Erzähl mir einen Witz über einen Piraten\u001b[0m");
 UserChatMessage chatMessage = 
